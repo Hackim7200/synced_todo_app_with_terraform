@@ -1,0 +1,49 @@
+# Root operation mapping and root operation fields.
+# Keep one concrete `type Query/Mutation/Subscription` definition in this file.
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+type Query {
+  getTodo(id: ID!): Todo!
+  listTodos(limit: Int, nextToken: String): TodoConnection!
+}
+
+type Mutation {
+  createTodo(input: CreateTodoInput!): Todo!
+  updateTodo(input: UpdateTodoInput!): Todo!
+  deleteTodo(id: ID!): Todo!
+}
+
+type Subscription {
+  onTodoChanged: Todo
+    @aws_subscribe(mutations: ["createTodo", "updateTodo", "deleteTodo"])
+}
+
+input CreateTodoInput {
+  id: ID!
+  title: String!
+  isCompleted: Boolean
+}
+
+input UpdateTodoInput {
+  id: ID!
+  title: String
+  isCompleted: Boolean
+}
+
+type Todo {
+  id: ID!
+  title: String!
+  isCompleted: Boolean!
+  owner: String!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type TodoConnection {
+  items: [Todo!]!
+  nextToken: String
+}

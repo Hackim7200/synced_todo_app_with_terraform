@@ -1,0 +1,85 @@
+# AppSync GraphQL — REST Client / httpYac
+# Copy AppSyncGraphQlUrl from CDK outputs into @url. Use Cognito ID token (token_use=id) as @token.
+# Subscriptions (onTodoChanged) require the WebSocket URL from AppSyncRealtimeUrl — not plain POST here.
+
+@url = https://a2zjdhfftvfvznek67g6hrub2q.appsync-api.eu-west-2.amazonaws.com/graphql
+# onTodoChanged: filtering Todo.owner === Cognito identity.sub is set by the subscription resolver (enhanced filtering).
+@token = eyJraWQiOiJkeE85ZHFZelg4d3ViK0lzRmtHbmpqUCtDMnQ0YTd6STh0SDU4QXVocGtZPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIwNjkyZDJlNC1lMDExLTcwNjktYWQ4ZC02OGU2OTliM2E3MmUiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiaXNzIjoiaHR0cHM6XC9cL2NvZ25pdG8taWRwLmV1LXdlc3QtMi5hbWF6b25hd3MuY29tXC9ldS13ZXN0LTJfYXBBWFpQRE9GIiwiY29nbml0bzp1c2VybmFtZSI6IjA2OTJkMmU0LWUwMTEtNzA2OS1hZDhkLTY4ZTY5OWIzYTcyZSIsIm9yaWdpbl9qdGkiOiIwODVkZDRlMy1mYTQyLTQyNzYtYThiZS1jZWIyNTExYmI2OTgiLCJhdWQiOiI2aDB0aGo0dGhnMDhtYnU1YjRmN2JxcGxmNCIsImV2ZW50X2lkIjoiNmNjNDNiZDEtOWU2MC00ODk2LWE4YzctOTQ1NDc0MTY4MmFkIiwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE3NzgyMzA1MjcsImV4cCI6MTc3ODIzNDEyNywiaWF0IjoxNzc4MjMwNTI3LCJqdGkiOiJhMWZiODU4Ni02N2E0LTRiYjYtYjhmMy02OTVmOTMwZWYxNzYiLCJlbWFpbCI6Imhpa21hdGhha2ltLmRldkBnbWFpbC5jb20ifQ.VFbKqNJjRNkDSLJzOMOtXSH6M0NAPn62bvVeoGza7xj2Rb4AP0fAl9l-MTKl5c3_OgXxVCwehK3mCWI4vxHA0rhdwhi2hLny1TUtwGr1_mG1uqYbUVyZnwTHg12w0eGCy2UgZyKVyCgb7CanVANtaXHB6uMPbvOCljbIy6hBpfzNGLg9NJhWXSV79ccJ2MiufMLhBhXDuSdZ3IN9yKC7WxfxWJH_Nj5iEb4Xl9zPqOdlAD17h_hkvUPh1T4zb7ZxCAxGtvcYwaroRS4sM0usqdQ2-AOstWwPLMa3drvXdaUGqPgOTAsftPJnwahqOdVRsr-BmRJH5wG2MIopqpvrGA
+
+
+
+# Subscription over WSS (not POST): subscription OnTodoChanged { onTodoChanged { id title isCompleted owner createdAt updatedAt } }
+
+### Create todo
+POST {{url}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "query": "mutation CreateTodo($input: CreateTodoInput!) { createTodo(input: $input) { id title isCompleted owner createdAt updatedAt } }",
+  "variables": {
+    "input": {
+      "id": "004",
+      "title": "new todo from terraform 2",
+      "isCompleted": false
+    }
+  }
+}
+
+### List todos (paginated)
+POST {{url}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "query": "query ListTodos($limit: Int, $nextToken: String) { listTodos(limit: $limit, nextToken: $nextToken) { items { id title isCompleted owner createdAt updatedAt } nextToken } }",
+  "variables": {
+    "limit": 50,
+    "nextToken": null
+  }
+}
+
+### Get one todo by id (replace id from create or list response)
+POST {{url}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "query": "query GetTodo($id: ID!) { getTodo(id: $id) { id title isCompleted owner createdAt updatedAt } }",
+  "variables": {
+    "id": "001"
+  }
+}
+
+### Update todo (replace id with a real todo id)
+POST {{url}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "query": "mutation UpdateTodo($input: UpdateTodoInput!) { updateTodo(input: $input) { id title isCompleted owner createdAt updatedAt } }",
+  "variables": {
+    "input": {
+      "id": "48e47062-3bef-4512-9062-f28d27d587f8",
+      "title": "Fatty cat",
+      "isCompleted": true
+    }
+  }
+}
+
+### Delete todo (replace id with a real todo id)
+POST {{url}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "query": "mutation DeleteTodo($id: ID!) { deleteTodo(id: $id) { id title isCompleted owner createdAt updatedAt } }",
+  "variables": {
+    "id": "48e47062-3bef-4512-9062-f28d27d587f8"
+  }
+}

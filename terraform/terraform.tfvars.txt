@@ -1,0 +1,9 @@
+
+#this file provides the values for root variables, if root variables are not used than this is unecessary
+#if this is hardcoded in variables.tf in modules than this is not necessary
+#this file gives your project variable dynamically
+
+aws_region = "eu-west-2"
+app_host = "localhost"
+app_port = 3000
+cognito_domain = "my-cognito-user-pool-domain"

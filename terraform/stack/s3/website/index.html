@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Landing Page</title>
+    <style>
+      :root {
+        --bg: #0f172a;
+        --card: #111827;
+        --text: #e5e7eb;
+        --muted: #94a3b8;
+        --primary: #3b82f6;
+        --primary-hover: #2563eb;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        background: linear-gradient(180deg, #0b1022 0%, var(--bg) 100%);
+        color: var(--text);
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+      }
+
+      .brand {
+        font-weight: 700;
+        letter-spacing: 0.4px;
+      }
+
+      nav a {
+        color: var(--muted);
+        text-decoration: none;
+        margin-left: 18px;
+        font-size: 0.95rem;
+      }
+
+      nav a:hover {
+        color: var(--text);
+      }
+
+      .hero {
+        display: grid;
+        gap: 20px;
+        align-items: center;
+        text-align: center;
+        padding: 90px 0 70px;
+      }
+
+      .badge {
+        display: inline-block;
+        margin: 0 auto;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        color: #bfdbfe;
+        background: rgba(59, 130, 246, 0.15);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+      }
+
+      h1 {
+        font-size: clamp(2rem, 5vw, 3.4rem);
+        line-height: 1.1;
+        max-width: 760px;
+        margin: 0 auto;
+      }
+
+      .subtitle {
+        max-width: 650px;
+        margin: 0 auto;
+        color: var(--muted);
+        font-size: 1.1rem;
+      }
+
+      .cta {
+        margin-top: 10px;
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        border: 0;
+        border-radius: 10px;
+        padding: 12px 20px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background: var(--primary-hover);
+      }
+
+      .btn-secondary {
+        background: #1f2937;
+        color: var(--text);
+        border: 1px solid #374151;
+      }
+
+      .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 14px;
+        margin: 20px 0 60px;
+      }
+
+      .feature {
+        background: rgba(17, 24, 39, 0.9);
+        border: 1px solid #1f2937;
+        border-radius: 14px;
+        padding: 18px;
+      }
+
+      .feature h3 {
+        margin-bottom: 8px;
+        font-size: 1rem;
+      }
+
+      .feature p {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      footer {
+        text-align: center;
+        color: var(--muted);
+        padding: 20px 0 30px;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div class="brand">YourBrand</div>
+        <nav>
+          <a href="#">Features</a>
+          <a href="#">Pricing</a>
+          <a href="#">Contact</a>
+          <a href="error.html">Error Page</a>
+        </nav>
+      </header>
+
+      <main class="hero">
+        <span class="badge">New • Fast • Simple</span>
+        <h1>Build and launch your idea in minutes</h1>
+        <p class="subtitle">
+          A clean, responsive landing page starter you can customize for your product, portfolio, or startup.
+        </p>
+        <div class="cta">
+          <a class="btn btn-primary" href="#">Get Started</a>
+          <a class="btn btn-secondary" href="#">Learn More</a>
+        </div>
+      </main>
+
+      <section class="features">
+        <article class="feature">
+          <h3>Responsive Design</h3>
+          <p>Looks great on desktop, tablet, and mobile.</p>
+        </article>
+        <article class="feature">
+          <h3>Easy to Customize</h3>
+          <p>Change text, colors, and sections in minutes.</p>
+        </article>
+        <article class="feature">
+          <h3>Fast Loading</h3>
+          <p>Single file setup with lightweight styles.</p>
+        </article>
+      </section>
+
+      <footer>© 2026 YourBrand. All rights reserved.</footer>
+    </div>
+  </body>
+</html>
