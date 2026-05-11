@@ -9,6 +9,7 @@ schema {
 type Query {
   getTodo(id: ID!): Todo!
   listTodos(limit: Int, nextToken: String): TodoConnection!
+  listTodosUpdatedAfter(updatedAfter: AWSDateTime!): TodoConnection!
 }
 
 type Mutation {
@@ -26,21 +27,36 @@ input CreateTodoInput {
   id: ID!
   title: String!
   isCompleted: Boolean
+  # metadata for sync
+  version: Int
+  updatedAt: AWSDateTime
+  createdAt: AWSDateTime
+  isDeleted: Boolean
+  syncStatus: String
 }
 
 input UpdateTodoInput {
   id: ID!
   title: String
   isCompleted: Boolean
+  # metadata for sync
+  version: Int
+  updatedAt: AWSDateTime
+  createdAt: AWSDateTime
+  isDeleted: Boolean
+  syncStatus: String
 }
 
 type Todo {
   id: ID!
   title: String!
-  isCompleted: Boolean!
-  owner: String!
-  createdAt: AWSDateTime!
+  isCompleted: Boolean
+  # metadata for sync
+  version: Int!
   updatedAt: AWSDateTime!
+  createdAt: AWSDateTime!
+  isDeleted: Boolean!
+  syncStatus: String!
 }
 
 type TodoConnection {

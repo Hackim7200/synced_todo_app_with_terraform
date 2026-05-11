@@ -8,8 +8,10 @@ export function request(ctx) {
       PK: { eq: `USER#${sub}` },
       SK: { beginsWith: "TODO#" },
     },
-    limit: ctx.args.limit ?? 200,
-    nextToken: ctx.args.nextToken,
+    filter: {
+      updatedAt: { gt: ctx.args.updatedAfter },
+    },
+    limit: 200,
   });
 }
 

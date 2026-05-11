@@ -85,6 +85,11 @@ locals {
       field = "listTodos"
       path  = "todo/listTodos.js"
     }
+    Query_listTodosUpdatedAfter = {
+      type  = "Query"
+      field = "listTodosUpdatedAfter"
+      path  = "todo/listTodosUpdatedAfter.js"
+    }
     Mutation_createTodo = {
       type  = "Mutation"
       field = "createTodo"

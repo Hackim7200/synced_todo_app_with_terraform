@@ -11,5 +11,12 @@ export function response(ctx) {
   if (ctx.error) util.error(ctx.error.message, ctx.error.type);
   if (!ctx.result) util.error("Todo not found", "NotFound");
   const { PK, SK, __typename, ...todo } = ctx.result;
-  return todo;
+  return {
+    ...todo,
+    completed: todo.completed ?? todo.isCompleted ?? false,
+    isCompleted: todo.completed ?? todo.isCompleted ?? false,
+    version: todo.version ?? 0,
+    isDeleted: todo.isDeleted ?? false,
+    syncStatus: todo.syncStatus ?? "synced",
+  };
 }
