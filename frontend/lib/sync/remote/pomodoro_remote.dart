@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:frontend/sync/remote_changes_batch.dart';
 
 class PomodoroRemote {
   const PomodoroRemote();
@@ -24,7 +25,7 @@ class PomodoroRemote {
     _requireData(response.data);
   }
 
-  Future<List<Map<String, dynamic>>> getPomodorosSince(DateTime? since) async {
+  Future<RemoteChangesBatch> getPomodorosSince(DateTime? since) async {
     final updatedAfter = (since ?? DateTime.fromMillisecondsSinceEpoch(0))
         .toUtc()
         .toIso8601String();
@@ -59,7 +60,25 @@ class PomodoroRemote {
     final decoded = jsonDecode(payload) as Map<String, dynamic>;
     final root = decoded['listPomodoros'] as Map<String, dynamic>? ?? const {};
     final items = root['items'] as List<dynamic>? ?? const [];
-    return items.whereType<Map<String, dynamic>>().toList();
+    final rows = items.whereType<Map<String, dynamic>>().toList();
+    DateTime? remoteMaxUpdatedAt;
+    for (final row in rows) {
+      final u = _parseUpdatedAt(row['updatedAt']);
+      if (u == null) continue;
+      if (remoteMaxUpdatedAt == null || u.isAfter(remoteMaxUpdatedAt)) {
+        remoteMaxUpdatedAt = u;
+      }
+    }
+    return RemoteChangesBatch(rows: rows, remoteMaxUpdatedAt: remoteMaxUpdatedAt);
+  }
+
+  static DateTime? _parseUpdatedAt(dynamic value) {
+    if (value is DateTime) return value.toUtc();
+    if (value is String) {
+      final parsed = DateTime.tryParse(value);
+      return parsed?.toUtc();
+    }
+    return null;
   }
 
   static String _requireData(String? data) {

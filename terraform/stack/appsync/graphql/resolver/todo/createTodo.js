@@ -15,14 +15,12 @@ export function request(ctx) {
     PK,
     SK,
     id: input.id,
-    owner: identity.sub,
     title: input.title,
     isCompleted: input.isCompleted ?? false,
     version: input.version ?? 0,
     createdAt: input.createdAt ?? now,
     updatedAt: input.updatedAt ?? now,
     isDeleted: input.isDeleted ?? false,
-    syncStatus: input.syncStatus ?? "synced",
   };
 
   return ddb.put({
@@ -33,13 +31,12 @@ export function request(ctx) {
 
 export function response(ctx) {
   if (ctx.error) util.error(ctx.error.message, ctx.error.type);
-  const { PK, SK, __typename, ...todo } = ctx.result;
+  const { PK, SK, __typename, syncStatus, owner, ...todo } = ctx.result;
   return {
     ...todo,
     completed: todo.completed ?? todo.isCompleted ?? false,
     isCompleted: todo.completed ?? todo.isCompleted ?? false,
     version: todo.version ?? 0,
     isDeleted: todo.isDeleted ?? false,
-    syncStatus: todo.syncStatus ?? "synced",
   };
 }

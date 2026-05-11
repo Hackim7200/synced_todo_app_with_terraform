@@ -35,18 +35,18 @@ class $TodoTableTable extends TodoTable
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _completedMeta = const VerificationMeta(
-    'completed',
+  static const VerificationMeta _isCompletedMeta = const VerificationMeta(
+    'isCompleted',
   );
   @override
-  late final GeneratedColumn<bool> completed = GeneratedColumn<bool>(
-    'completed',
+  late final GeneratedColumn<bool> isCompleted = GeneratedColumn<bool>(
+    'is_completed',
     aliasedName,
     false,
     type: DriftSqlType.bool,
     requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("completed" IN (0, 1))',
+      'CHECK ("is_completed" IN (0, 1))',
     ),
     defaultValue: const Constant(false),
   );
@@ -121,7 +121,7 @@ class $TodoTableTable extends TodoTable
   List<GeneratedColumn> get $columns => [
     id,
     title,
-    completed,
+    isCompleted,
     version,
     updatedAt,
     createdAt,
@@ -153,10 +153,13 @@ class $TodoTableTable extends TodoTable
     } else if (isInserting) {
       context.missing(_titleMeta);
     }
-    if (data.containsKey('completed')) {
+    if (data.containsKey('is_completed')) {
       context.handle(
-        _completedMeta,
-        completed.isAcceptableOrUnknown(data['completed']!, _completedMeta),
+        _isCompletedMeta,
+        isCompleted.isAcceptableOrUnknown(
+          data['is_completed']!,
+          _isCompletedMeta,
+        ),
       );
     }
     if (data.containsKey('version')) {
@@ -206,9 +209,9 @@ class $TodoTableTable extends TodoTable
         DriftSqlType.string,
         data['${effectivePrefix}title'],
       )!,
-      completed: attachedDatabase.typeMapping.read(
+      isCompleted: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
-        data['${effectivePrefix}completed'],
+        data['${effectivePrefix}is_completed'],
       )!,
       version: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
@@ -242,7 +245,7 @@ class $TodoTableTable extends TodoTable
 class TodoTableData extends DataClass implements Insertable<TodoTableData> {
   final String id;
   final String title;
-  final bool completed;
+  final bool isCompleted;
   final int version;
   final DateTime updatedAt;
   final DateTime createdAt;
@@ -251,7 +254,7 @@ class TodoTableData extends DataClass implements Insertable<TodoTableData> {
   const TodoTableData({
     required this.id,
     required this.title,
-    required this.completed,
+    required this.isCompleted,
     required this.version,
     required this.updatedAt,
     required this.createdAt,
@@ -263,7 +266,7 @@ class TodoTableData extends DataClass implements Insertable<TodoTableData> {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
     map['title'] = Variable<String>(title);
-    map['completed'] = Variable<bool>(completed);
+    map['is_completed'] = Variable<bool>(isCompleted);
     map['version'] = Variable<int>(version);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     map['created_at'] = Variable<DateTime>(createdAt);
@@ -276,7 +279,7 @@ class TodoTableData extends DataClass implements Insertable<TodoTableData> {
     return TodoTableCompanion(
       id: Value(id),
       title: Value(title),
-      completed: Value(completed),
+      isCompleted: Value(isCompleted),
       version: Value(version),
       updatedAt: Value(updatedAt),
       createdAt: Value(createdAt),
@@ -293,7 +296,7 @@ class TodoTableData extends DataClass implements Insertable<TodoTableData> {
     return TodoTableData(
       id: serializer.fromJson<String>(json['id']),
       title: serializer.fromJson<String>(json['title']),
-      completed: serializer.fromJson<bool>(json['completed']),
+      isCompleted: serializer.fromJson<bool>(json['isCompleted']),
       version: serializer.fromJson<int>(json['version']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -307,7 +310,7 @@ class TodoTableData extends DataClass implements Insertable<TodoTableData> {
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
       'title': serializer.toJson<String>(title),
-      'completed': serializer.toJson<bool>(completed),
+      'isCompleted': serializer.toJson<bool>(isCompleted),
       'version': serializer.toJson<int>(version),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'createdAt': serializer.toJson<DateTime>(createdAt),
@@ -319,7 +322,7 @@ class TodoTableData extends DataClass implements Insertable<TodoTableData> {
   TodoTableData copyWith({
     String? id,
     String? title,
-    bool? completed,
+    bool? isCompleted,
     int? version,
     DateTime? updatedAt,
     DateTime? createdAt,
@@ -328,7 +331,7 @@ class TodoTableData extends DataClass implements Insertable<TodoTableData> {
   }) => TodoTableData(
     id: id ?? this.id,
     title: title ?? this.title,
-    completed: completed ?? this.completed,
+    isCompleted: isCompleted ?? this.isCompleted,
     version: version ?? this.version,
     updatedAt: updatedAt ?? this.updatedAt,
     createdAt: createdAt ?? this.createdAt,
@@ -339,7 +342,9 @@ class TodoTableData extends DataClass implements Insertable<TodoTableData> {
     return TodoTableData(
       id: data.id.present ? data.id.value : this.id,
       title: data.title.present ? data.title.value : this.title,
-      completed: data.completed.present ? data.completed.value : this.completed,
+      isCompleted: data.isCompleted.present
+          ? data.isCompleted.value
+          : this.isCompleted,
       version: data.version.present ? data.version.value : this.version,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -355,7 +360,7 @@ class TodoTableData extends DataClass implements Insertable<TodoTableData> {
     return (StringBuffer('TodoTableData(')
           ..write('id: $id, ')
           ..write('title: $title, ')
-          ..write('completed: $completed, ')
+          ..write('isCompleted: $isCompleted, ')
           ..write('version: $version, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('createdAt: $createdAt, ')
@@ -369,7 +374,7 @@ class TodoTableData extends DataClass implements Insertable<TodoTableData> {
   int get hashCode => Object.hash(
     id,
     title,
-    completed,
+    isCompleted,
     version,
     updatedAt,
     createdAt,
@@ -382,7 +387,7 @@ class TodoTableData extends DataClass implements Insertable<TodoTableData> {
       (other is TodoTableData &&
           other.id == this.id &&
           other.title == this.title &&
-          other.completed == this.completed &&
+          other.isCompleted == this.isCompleted &&
           other.version == this.version &&
           other.updatedAt == this.updatedAt &&
           other.createdAt == this.createdAt &&
@@ -393,7 +398,7 @@ class TodoTableData extends DataClass implements Insertable<TodoTableData> {
 class TodoTableCompanion extends UpdateCompanion<TodoTableData> {
   final Value<String> id;
   final Value<String> title;
-  final Value<bool> completed;
+  final Value<bool> isCompleted;
   final Value<int> version;
   final Value<DateTime> updatedAt;
   final Value<DateTime> createdAt;
@@ -403,7 +408,7 @@ class TodoTableCompanion extends UpdateCompanion<TodoTableData> {
   const TodoTableCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
-    this.completed = const Value.absent(),
+    this.isCompleted = const Value.absent(),
     this.version = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -414,7 +419,7 @@ class TodoTableCompanion extends UpdateCompanion<TodoTableData> {
   TodoTableCompanion.insert({
     required String id,
     required String title,
-    this.completed = const Value.absent(),
+    this.isCompleted = const Value.absent(),
     this.version = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -426,7 +431,7 @@ class TodoTableCompanion extends UpdateCompanion<TodoTableData> {
   static Insertable<TodoTableData> custom({
     Expression<String>? id,
     Expression<String>? title,
-    Expression<bool>? completed,
+    Expression<bool>? isCompleted,
     Expression<int>? version,
     Expression<DateTime>? updatedAt,
     Expression<DateTime>? createdAt,
@@ -437,7 +442,7 @@ class TodoTableCompanion extends UpdateCompanion<TodoTableData> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (title != null) 'title': title,
-      if (completed != null) 'completed': completed,
+      if (isCompleted != null) 'is_completed': isCompleted,
       if (version != null) 'version': version,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (createdAt != null) 'created_at': createdAt,
@@ -450,7 +455,7 @@ class TodoTableCompanion extends UpdateCompanion<TodoTableData> {
   TodoTableCompanion copyWith({
     Value<String>? id,
     Value<String>? title,
-    Value<bool>? completed,
+    Value<bool>? isCompleted,
     Value<int>? version,
     Value<DateTime>? updatedAt,
     Value<DateTime>? createdAt,
@@ -461,7 +466,7 @@ class TodoTableCompanion extends UpdateCompanion<TodoTableData> {
     return TodoTableCompanion(
       id: id ?? this.id,
       title: title ?? this.title,
-      completed: completed ?? this.completed,
+      isCompleted: isCompleted ?? this.isCompleted,
       version: version ?? this.version,
       updatedAt: updatedAt ?? this.updatedAt,
       createdAt: createdAt ?? this.createdAt,
@@ -480,8 +485,8 @@ class TodoTableCompanion extends UpdateCompanion<TodoTableData> {
     if (title.present) {
       map['title'] = Variable<String>(title.value);
     }
-    if (completed.present) {
-      map['completed'] = Variable<bool>(completed.value);
+    if (isCompleted.present) {
+      map['is_completed'] = Variable<bool>(isCompleted.value);
     }
     if (version.present) {
       map['version'] = Variable<int>(version.value);
@@ -509,7 +514,7 @@ class TodoTableCompanion extends UpdateCompanion<TodoTableData> {
     return (StringBuffer('TodoTableCompanion(')
           ..write('id: $id, ')
           ..write('title: $title, ')
-          ..write('completed: $completed, ')
+          ..write('isCompleted: $isCompleted, ')
           ..write('version: $version, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('createdAt: $createdAt, ')
@@ -1216,7 +1221,7 @@ typedef $$TodoTableTableCreateCompanionBuilder =
     TodoTableCompanion Function({
       required String id,
       required String title,
-      Value<bool> completed,
+      Value<bool> isCompleted,
       Value<int> version,
       Value<DateTime> updatedAt,
       Value<DateTime> createdAt,
@@ -1228,7 +1233,7 @@ typedef $$TodoTableTableUpdateCompanionBuilder =
     TodoTableCompanion Function({
       Value<String> id,
       Value<String> title,
-      Value<bool> completed,
+      Value<bool> isCompleted,
       Value<int> version,
       Value<DateTime> updatedAt,
       Value<DateTime> createdAt,
@@ -1279,8 +1284,8 @@ class $$TodoTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<bool> get completed => $composableBuilder(
-    column: $table.completed,
+  ColumnFilters<bool> get isCompleted => $composableBuilder(
+    column: $table.isCompleted,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1354,8 +1359,8 @@ class $$TodoTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<bool> get completed => $composableBuilder(
-    column: $table.completed,
+  ColumnOrderings<bool> get isCompleted => $composableBuilder(
+    column: $table.isCompleted,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -1400,8 +1405,10 @@ class $$TodoTableTableAnnotationComposer
   GeneratedColumn<String> get title =>
       $composableBuilder(column: $table.title, builder: (column) => column);
 
-  GeneratedColumn<bool> get completed =>
-      $composableBuilder(column: $table.completed, builder: (column) => column);
+  GeneratedColumn<bool> get isCompleted => $composableBuilder(
+    column: $table.isCompleted,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<int> get version =>
       $composableBuilder(column: $table.version, builder: (column) => column);
@@ -1476,7 +1483,7 @@ class $$TodoTableTableTableManager
               ({
                 Value<String> id = const Value.absent(),
                 Value<String> title = const Value.absent(),
-                Value<bool> completed = const Value.absent(),
+                Value<bool> isCompleted = const Value.absent(),
                 Value<int> version = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
@@ -1486,7 +1493,7 @@ class $$TodoTableTableTableManager
               }) => TodoTableCompanion(
                 id: id,
                 title: title,
-                completed: completed,
+                isCompleted: isCompleted,
                 version: version,
                 updatedAt: updatedAt,
                 createdAt: createdAt,
@@ -1498,7 +1505,7 @@ class $$TodoTableTableTableManager
               ({
                 required String id,
                 required String title,
-                Value<bool> completed = const Value.absent(),
+                Value<bool> isCompleted = const Value.absent(),
                 Value<int> version = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
@@ -1508,7 +1515,7 @@ class $$TodoTableTableTableManager
               }) => TodoTableCompanion.insert(
                 id: id,
                 title: title,
-                completed: completed,
+                isCompleted: isCompleted,
                 version: version,
                 updatedAt: updatedAt,
                 createdAt: createdAt,

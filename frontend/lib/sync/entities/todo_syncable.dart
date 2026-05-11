@@ -2,6 +2,7 @@
 import 'package:drift/drift.dart';
 import 'package:frontend/database/database.dart';
 import 'package:frontend/sync/remote/todo_remote.dart';
+import 'package:frontend/sync/remote_changes_batch.dart';
 import 'package:frontend/sync/entities/syncable_entity.dart';
 
 class TodoSyncable implements SyncableEntity {
@@ -9,7 +10,6 @@ class TodoSyncable implements SyncableEntity {
 
   final AppDatabase _db;
   final TodoRemote _remote;
-  DateTime? _lastSyncedAt;
 
   @override
   String get entityName => 'todo';
@@ -39,15 +39,42 @@ class TodoSyncable implements SyncableEntity {
   }
 
   @override
-  Future<DateTime?> getLastSyncedAt() async => _lastSyncedAt;
+  Future<DateTime?> getLastSyncedAt() async {
+    await _ensureSyncMetadataTable();
+    final result = await _db.customSelect(
+      '''
+      SELECT last_synced_at
+      FROM sync_metadata
+      WHERE entity_name = ?
+      LIMIT 1
+      ''',
+      variables: [Variable.withString(entityName)],
+      readsFrom: {},
+    ).getSingleOrNull();
 
-  @override
-  Future<void> setLastSyncedAt(DateTime time) async {
-    _lastSyncedAt = time;
+    final rawValue = result?.data['last_synced_at'];
+    if (rawValue is int) {
+      return DateTime.fromMillisecondsSinceEpoch(rawValue, isUtc: true);
+    }
+    return null;
   }
 
   @override
-  Future<List<Map<String, dynamic>>> fetchRemoteChanges(DateTime? since) {
+  Future<void> setLastSyncedAt(DateTime time) async {
+    await _ensureSyncMetadataTable();
+    await _db.customStatement(
+      '''
+      INSERT INTO sync_metadata(entity_name, last_synced_at)
+      VALUES (?, ?)
+      ON CONFLICT(entity_name)
+      DO UPDATE SET last_synced_at = excluded.last_synced_at
+      ''',
+      [entityName, time.toUtc().millisecondsSinceEpoch],
+    );
+  }
+
+  @override
+  Future<RemoteChangesBatch> fetchRemoteChanges(DateTime? since) {
     return _remote.getTodosSince(since);
   }
 
@@ -69,7 +96,7 @@ class TodoSyncable implements SyncableEntity {
     final companion = TodoTableCompanion(
       id: Value(id),
       title: Value((record['title'] as String?) ?? ''),
-      completed: Value((record['completed'] as bool?) ?? false),
+      isCompleted: Value((record['isCompleted'] as bool?) ?? false),
       version: Value(_toInt(record['version']) ?? 0),
       updatedAt: Value(_toDateTime(record['updatedAt']) ?? DateTime.now()),
       createdAt: Value(_toDateTime(record['createdAt']) ?? DateTime.now()),
@@ -83,12 +110,11 @@ class TodoSyncable implements SyncableEntity {
     return <String, dynamic>{
       'id': row.id,
       'title': row.title,
-      'completed': row.completed,
+      'isCompleted': row.isCompleted,
       'version': row.version,
       'updatedAt': row.updatedAt.toUtc().toIso8601String(),
       'createdAt': row.createdAt.toUtc().toIso8601String(),
       'isDeleted': row.isDeleted,
-      'syncStatus': row.syncStatus,
     };
   }
 
@@ -108,5 +134,14 @@ class TodoSyncable implements SyncableEntity {
     if (value is DateTime) return value;
     if (value is String) return DateTime.tryParse(value);
     return null;
+  }
+
+  Future<void> _ensureSyncMetadataTable() {
+    return _db.customStatement('''
+      CREATE TABLE IF NOT EXISTS sync_metadata (
+        entity_name TEXT PRIMARY KEY,
+        last_synced_at INTEGER
+      )
+    ''');
   }
 }

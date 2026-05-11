@@ -19,7 +19,7 @@ class AppDatabase extends _$AppDatabase {
     : super(_openConnection(dbDirectory, sqliteFileName));
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -45,6 +45,21 @@ class AppDatabase extends _$AppDatabase {
         // Pomodoro PK changed from int to UUID text; todos unchanged.
         await m.drop(pomodoroTable);
         await m.createTable(pomodoroTable);
+      }
+      if (from < 7) {
+        // Todo: `completed` -> `is_completed` (Dart `isCompleted`) to match GraphQL naming.
+        final columns = await customSelect(
+          'PRAGMA table_info(todo_table)',
+          readsFrom: {todoTable},
+        ).get();
+        final hasLegacyCompleted = columns.any(
+          (r) => r.data['name'] == 'completed',
+        );
+        if (hasLegacyCompleted) {
+          await customStatement(
+            'ALTER TABLE todo_table RENAME COLUMN completed TO is_completed',
+          );
+        }
       }
     },
   );

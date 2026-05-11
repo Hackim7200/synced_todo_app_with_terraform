@@ -13,7 +13,7 @@ class SyncScheduler {
     unawaited(_coordinator.syncOnce());
     _timer?.cancel();
     _timer = Timer.periodic(
-      const Duration(minutes: 1),
+      const Duration(seconds: 5),
       (_) => unawaited(_coordinator.syncOnce()),
     );
   }

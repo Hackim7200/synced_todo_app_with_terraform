@@ -1,3 +1,5 @@
+import 'package:frontend/sync/remote_changes_batch.dart';
+
 /// Defines the shared contract each entity sync implementation must follow.
 abstract class SyncableEntity {
   String get entityName;
@@ -10,7 +12,7 @@ abstract class SyncableEntity {
   // pull side
   Future<DateTime?> getLastSyncedAt();
   Future<void> setLastSyncedAt(DateTime time);
-  Future<List<Map<String, dynamic>>> fetchRemoteChanges(DateTime? since);
+  Future<RemoteChangesBatch> fetchRemoteChanges(DateTime? since);
 
   // LWW
   Future<Map<String, dynamic>?> getLocalRow(String id);

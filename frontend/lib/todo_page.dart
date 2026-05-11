@@ -47,6 +47,75 @@ class _TodoPageState extends State<TodoPage> {
     }
   }
 
+  Future<void> _editTodo(TodoTableData todo) async {
+    final controller = TextEditingController(text: todo.title);
+    try {
+      final result = await showDialog<String>(
+        context: context,
+        builder: (dialogContext) {
+          return AlertDialog(
+            title: const Text('Edit todo'),
+            content: TextField(
+              controller: controller,
+              autofocus: true,
+              maxLength: 32,
+              textInputAction: TextInputAction.done,
+              onSubmitted: (value) {
+                final trimmed = value.trim();
+                if (trimmed.isEmpty) return;
+                Navigator.of(dialogContext).pop(trimmed);
+              },
+              decoration: const InputDecoration(
+                labelText: 'Title',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: const Text('Cancel'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  final trimmed = controller.text.trim();
+                  if (trimmed.isEmpty) {
+                    ScaffoldMessenger.of(dialogContext).showSnackBar(
+                      const SnackBar(
+                        content: Text('Title cannot be empty.'),
+                      ),
+                    );
+                    return;
+                  }
+                  Navigator.of(dialogContext).pop(trimmed);
+                },
+                child: const Text('Save'),
+              ),
+            ],
+          );
+        },
+      );
+
+      if (!mounted || result == null) return;
+      if (result == todo.title) return;
+
+      try {
+        await widget.todoService.updateTodoTitle(id: todo.id, title: result);
+      } on ArgumentError catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.message ?? 'Invalid title.')));
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to update todo: $e')));
+      }
+    } finally {
+      controller.dispose();
+    }
+  }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -134,10 +203,20 @@ class _TodoPageState extends State<TodoPage> {
                           );
                         },
                       ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete_outline),
-                        tooltip: 'Delete',
-                        onPressed: () => _deleteTodo(todo.id),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit_outlined),
+                            tooltip: 'Edit',
+                            onPressed: () => _editTodo(todo),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline),
+                            tooltip: 'Delete',
+                            onPressed: () => _deleteTodo(todo.id),
+                          ),
+                        ],
                       ),
                     );
                   },

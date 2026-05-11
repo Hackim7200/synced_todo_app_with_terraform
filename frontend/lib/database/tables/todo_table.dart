@@ -4,7 +4,7 @@ class TodoTable extends Table {
   TextColumn get id => text().withLength(min: 1, max: 64)();//UUID must be used instead of int since the same uuid will be given to ddb lambda wont generate new uuid
 
   TextColumn get title => text().withLength(min: 1, max: 32)();
-  BoolColumn get completed => boolean().withDefault(const Constant(false))();
+  BoolColumn get isCompleted => boolean().withDefault(const Constant(false))();
 
   // version for sync correctness
   IntColumn get version => integer().withDefault(const Constant(0))();

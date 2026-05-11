@@ -20,14 +20,13 @@ export function response(ctx) {
 
   const rows = ctx.result?.items ?? [];
   const items = rows.map((row) => {
-    const { PK, SK, __typename, ...todo } = row;
+    const { PK, SK, __typename, syncStatus, owner, ...todo } = row;
     return {
       ...todo,
       completed: todo.completed ?? todo.isCompleted ?? false,
       isCompleted: todo.completed ?? todo.isCompleted ?? false,
       version: todo.version ?? 0,
       isDeleted: todo.isDeleted ?? false,
-      syncStatus: todo.syncStatus ?? "synced",
     };
   });
 

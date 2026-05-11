@@ -2,6 +2,7 @@
 import 'package:drift/drift.dart';
 import 'package:frontend/database/database.dart';
 import 'package:frontend/sync/remote/pomodoro_remote.dart';
+import 'package:frontend/sync/remote_changes_batch.dart';
 import 'package:frontend/sync/entities/syncable_entity.dart';
 
 class PomodoroSyncable implements SyncableEntity {
@@ -28,7 +29,7 @@ class PomodoroSyncable implements SyncableEntity {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> fetchRemoteChanges(DateTime? since) {
+  Future<RemoteChangesBatch> fetchRemoteChanges(DateTime? since) {
     return _remote.getPomodorosSince(since);
   }
 

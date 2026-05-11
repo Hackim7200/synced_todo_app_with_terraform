@@ -39,7 +39,7 @@ class TodoService {
       document: r'''
         mutation CreateTodo($input: CreateTodoInput!) {
           createTodo(input: $input) {
-            id title isCompleted owner
+            id title isCompleted
           }
         }
       ''',
@@ -63,7 +63,7 @@ class TodoService {
       document: r'''
         mutation UpdateTodo($input: UpdateTodoInput!) {
           updateTodo(input: $input) {
-            id title isCompleted owner
+            id title isCompleted
           }
         }
       ''',
@@ -86,7 +86,7 @@ class TodoService {
       apiName: _graphqlApiName,
       document: r'''
         mutation DeleteTodo($id: ID!) {
-          deleteTodo(id: $id) { id owner }
+          deleteTodo(id: $id) { id }
         }
       ''',
       variables: {'id': id},
@@ -108,7 +108,7 @@ class TodoService {
           apiName: _graphqlApiName,
           document: r'''
             subscription OnTodoChanged {
-              onTodoChanged { id title isCompleted owner }
+              onTodoChanged { id title isCompleted }
             }
           ''',
         );
